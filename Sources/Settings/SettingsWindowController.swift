@@ -166,5 +166,5 @@ extension SettingsWindowController {
 }
 
 private final class SettingsWindow: UserInteractionPausableWindow {
-	override var canBecomeMain: Bool { false }
+	override var canBecomeMain: Bool { true }
 }
