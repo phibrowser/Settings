@@ -22,6 +22,14 @@ extension SettingsPane {
 	}
 
 	public var toolbarItemIcon: NSImage { .empty }
+
+	public func notifyPaneTitleDidChange() {
+		NotificationCenter.default.post(name: .settingsPaneTitleDidChange, object: self)
+	}
+}
+
+public extension Notification.Name {
+	static let settingsPaneTitleDidChange = Notification.Name("com.sindresorhus.Settings.PaneTitleDidChange")
 }
 
 extension Settings.PaneIdentifier {

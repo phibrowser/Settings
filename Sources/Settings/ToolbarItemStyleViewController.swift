@@ -55,6 +55,15 @@ final class ToolbarItemStyleViewController: NSObject, SettingsStyleController {
 	func selectTab(index: Int) {
 		toolbar.selectedItemIdentifier = panes[index].toolbarItemIdentifier
 	}
+
+	func refreshPaneTitle(_ pane: SettingsPane) {
+		let itemIdentifier = pane.toolbarItemIdentifier
+		guard let item = toolbar.items.first(where: { $0.itemIdentifier == itemIdentifier }) else {
+			return
+		}
+
+		item.label = pane.paneTitle
+	}
   
 	public func refreshPreviousSelectedItem() {
 		// On macOS Sonoma, sometimes NSToolbar would preserve the

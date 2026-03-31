@@ -7,6 +7,7 @@ protocol SettingsStyleController: AnyObject {
 	func toolbarItemIdentifiers() -> [NSToolbarItem.Identifier]
 	func toolbarItem(paneIdentifier: Settings.PaneIdentifier) -> NSToolbarItem?
 	func selectTab(index: Int)
+	func refreshPaneTitle(_ pane: SettingsPane)
 }
 
 protocol SettingsStyleControllerDelegate: AnyObject {

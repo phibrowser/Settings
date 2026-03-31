@@ -36,6 +36,30 @@ final class SegmentedControlStyleViewController: NSViewController, SettingsStyle
 		view = createSegmentedControl(panes: panes)
 	}
 
+	private func calculateSegmentSize() -> CGSize {
+		let insets = CGSize(width: 36, height: 12)
+		var maxSize = CGSize.zero
+
+		for pane in panes {
+			let title = pane.paneTitle
+			let titleSize = title.size(
+				withAttributes: [
+					.font: NSFont.systemFont(ofSize: NSFont.systemFontSize(for: .regular))
+				]
+			)
+
+			maxSize = CGSize(
+				width: max(titleSize.width, maxSize.width),
+				height: max(titleSize.height, maxSize.height)
+			)
+		}
+
+		return CGSize(
+			width: maxSize.width + insets.width,
+			height: maxSize.height + insets.height
+		)
+	}
+
 	fileprivate func createSegmentedControl(panes: [SettingsPane]) -> NSSegmentedControl {
 		let segmentedControl = NSSegmentedControl()
 		segmentedControl.segmentCount = panes.count
@@ -49,29 +73,7 @@ final class SegmentedControlStyleViewController: NSViewController, SettingsStyle
 			cell.trackingMode = .selectOne
 		}
 
-		let segmentSize: CGSize = {
-			let insets = CGSize(width: 36, height: 12)
-			var maxSize = CGSize.zero
-
-			for pane in panes {
-				let title = pane.paneTitle
-				let titleSize = title.size(
-					withAttributes: [
-						.font: NSFont.systemFont(ofSize: NSFont.systemFontSize(for: .regular))
-					]
-				)
-
-				maxSize = CGSize(
-					width: max(titleSize.width, maxSize.width),
-					height: max(titleSize.height, maxSize.height)
-				)
-			}
-
-			return CGSize(
-				width: maxSize.width + insets.width,
-				height: maxSize.height + insets.height
-			)
-		}()
+		let segmentSize = calculateSegmentSize()
 
 		let segmentBorderWidth = Double(panes.count) + 1
 		let segmentWidth = segmentSize.width * Double(panes.count) + segmentBorderWidth
@@ -87,6 +89,25 @@ final class SegmentedControlStyleViewController: NSViewController, SettingsStyle
 		}
 
 		return segmentedControl
+	}
+
+	func refreshPaneTitle(_ pane: SettingsPane) {
+		guard let index = panes.firstIndex(where: { $0.paneIdentifier == pane.paneIdentifier }) else {
+			return
+		}
+
+		segmentedControl.setLabel(pane.paneTitle, forSegment: index)
+
+		let segmentSize = calculateSegmentSize()
+		let segmentBorderWidth = Double(panes.count) + 1
+		let segmentWidth = segmentSize.width * Double(panes.count) + segmentBorderWidth
+		let segmentHeight = segmentSize.height
+		
+		segmentedControl.frame = CGRect(x: 0, y: 0, width: segmentWidth, height: segmentHeight)
+
+		for i in 0..<panes.count {
+			segmentedControl.setWidth(segmentSize.width, forSegment: i)
+		}
 	}
 
 	@IBAction private func segmentedControlAction(_ control: NSSegmentedControl) {

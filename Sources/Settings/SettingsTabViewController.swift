@@ -23,6 +23,10 @@ final class SettingsTabViewController: NSViewController, SettingsStyleController
 
 		return panes[activeTab]
 	}
+	
+	deinit {
+		NotificationCenter.default.removeObserver(self)
+	}
 
 	override func loadView() {
 		view = NSView()
@@ -33,6 +37,13 @@ final class SettingsTabViewController: NSViewController, SettingsStyleController
 		self.panes = panes
 		self.style = style
 		children = panes
+
+		NotificationCenter.default.addObserver(
+			self,
+			selector: #selector(paneTitleDidChange(_:)),
+			name: .settingsPaneTitleDidChange,
+			object: nil
+		)
 
 		let toolbar = NSToolbar(identifier: "SettingsToolbar")
 		toolbar.allowsUserCustomization = false
@@ -104,6 +115,21 @@ final class SettingsTabViewController: NSViewController, SettingsStyleController
 				return "\(appName) \(settings)"
 			}
 		}()
+	}
+
+	@objc private func paneTitleDidChange(_ notification: Notification) {
+		guard
+			let pane = notification.object as? SettingsPane,
+			let index = panes.firstIndex(where: { $0.paneIdentifier == pane.paneIdentifier })
+		else {
+			return
+		}
+
+		settingsStyleController.refreshPaneTitle(pane)
+
+		if index == activeTab {
+			updateWindowTitle(tabIndex: index)
+		}
 	}
 
 	/**
